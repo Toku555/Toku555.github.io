@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>単語帳作成</title>
+    <style type="text/css">
+      .main{
+        text-align: center;
+        margin: auto;
+      }
+    </style>
+  </head>
+
+  <body bgcolor="#B2A1A3">
+    <div class="main">
+      <textarea id="txarea" rows="16" cols="60"></textarea>
+      <br /><input type="file" id="sfile" accept=".txt">
+      <br /><input type="button" onclick="bt_mkVBook();" value="単語帳作成">
+    </div>
+
+    <script type="text/javascript">
+      var sfile=document.getElementById("sfile");
+      sfile.onchange=function(ev){
+        try{
+          var reader=new FileReader();
+          reader.readAsText(ev.target.files[0]);
+
+          reader.onload=function(ev){
+            document.getElementById("txarea").value=reader.result;
+          };
+        }catch(e){
+          alert(e);
+        }
+      };
+
+      function bt_mkVBook(){
+        var str=document.getElementById("txarea").value;
+        var row=str.split("\n");
+        var table=[];
+
+        for(var i=0;i<row.length;i++){
+          table.push(row[i].split(">>>"));
+        }
+
+        try{
+          var win_f=window.open();
+          var win_b=window.open();
+          var win_f_html='<html><head><title>表</title><style type="text/css">.table1{width:512px;border-collapse:collapse;table-layout:fixed;overflow:hidden;word-wrap:break-word;} .table1 td{height:91px;width:128px;text-align:center;}</style></head><body><table class="table1" border=1>';
+          var win_b_html='<html><head><title>裏</title><style type="text/css">.table1{width:512px;border-collapse:collapse;table-layout:fixed;overflow:hidden;word-wrap:break-word;} .table1 td{height:91px;width:128px;text-align:center;}</style></head><body><table class="table1" border=1>';
+
+          for(var i1=0;i1<Math.ceil(table.length/4);i1++){
+            win_f_html+='<tr id="tr'+i1+'">';
+            win_b_html+='<tr id="tr'+i1+'">';
+
+            for(var i2=0;i2<4;i2++){
+
+              win_f_html+='<td>'+(table[i1*4+i2]==undefined ? "":table[i1*4+i2][0])+'</td>';
+              win_b_html+='<td>'+(table[i1*4+3-i2]==undefined ? "":table[i1*4+3-i2][1])+'</td>';
+            }
+
+            win_f_html+="</tr>";
+            win_b_html+="</tr>";
+
+          }
+
+          win_f_html+="</table></body></html>";
+          win_b_html+="</table></body></html>";
+
+          win_f.document.open();
+          win_f.document.write(win_f_html);
+          win_f.document.close();
+
+          win_b.document.open();
+          win_b.document.write(win_b_html);
+          win_b.document.close();
+
+          //setTimeout(function(){
+            for(var i=0;i<Math.ceil(table.length/4);i++){
+              var tr_f=win_f.document.getElementById("tr"+i);
+              var tr_b=win_b.document.getElementById("tr"+i);
+              var max=Math.max(tr_f.clientHeight, tr_b.clientHeight);
+              tr_f.style.height=max;
+              tr_b.style.height=max;
+            }
+          //}, 3000);
+
+
+        }catch(e){
+          alert(e);
+        }
+
+      }
+    </script>
+  </body>
+</html>
